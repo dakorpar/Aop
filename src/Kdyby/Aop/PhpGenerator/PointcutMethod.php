@@ -62,8 +62,9 @@ class PointcutMethod extends Code\Method
 		}
 
 		$method = new static($from->isClosure() ? NULL : $from->getName());
+		$factory = new Code\Factory();
 		foreach ($from->getParameters() as $param) {
-			$method->parameters[$param->getName()] = Parameter::from($param);
+			$method->parameters[$param->getName()] = $factory->fromParameterReflection($param);
 		}
 		if ($from instanceof \ReflectionMethod) {
 			$method->static = $from->isStatic();
