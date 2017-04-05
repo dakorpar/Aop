@@ -67,7 +67,7 @@ class PointcutMethod extends Code\Method
 		}
 		$method->setReturnReference($from->returnsReference());
 		$method->setVariadic($from->isVariadic());
-		$method->setComment(Helpers::unformatDocComment($from->getDocComment()));
+		$method->setComment(Code\Helpers::unformatDocComment($from->getDocComment()));
 		if (PHP_VERSION_ID >= 70000 && $from->hasReturnType()) {
 			$method->setReturnType((string) $from->getReturnType());
 			$method->setReturnNullable($from->getReturnType()->allowsNull());
