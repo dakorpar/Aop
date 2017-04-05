@@ -48,36 +48,29 @@ class PointcutMethod extends Code\Method
 	private $after = [];
 
 
-	/**
-	 * @return self
-	 */
 	public static function from($from)
 	{
-		if (is_string($from) && strpos($from, '::')) {
-			$from = new \ReflectionMethod($from);
-		} elseif (is_array($from)) {
-			$from = new \ReflectionMethod($from[0], $from[1]);
-		} elseif (!$from instanceof \ReflectionFunctionAbstract) {
-			$from = new \ReflectionFunction($from);
-		}
-
 		$method = new static($from->isClosure() ? NULL : $from->getName());
+		$params = [];
 		$factory = new Code\Factory();
 		foreach ($from->getParameters() as $param) {
-			$method->parameters[$param->getName()] = $factory->fromParameterReflection($param);
+			$params[$param->getName()] = $factory->fromParameterReflection($param);
 		}
+		$method->setParameters($params);
 		if ($from instanceof \ReflectionMethod) {
-			$method->static = $from->isStatic();
-			$method->visibility = $from->isPrivate() ? 'private' : ($from->isProtected() ? 'protected' : NULL);
-			$method->final = $from->isFinal();
-			$method->abstract = $from->isAbstract() && !$from->getDeclaringClass()->isInterface();
-			$method->body = $from->isAbstract() ? FALSE : '';
+			$isInterface = $from->getDeclaringClass()->isInterface();
+			$method->setStatic($from->isStatic());
+			$method->setVisibility($from->isPrivate() ? 'private' : ($from->isProtected() ? 'protected' : ($isInterface ? NULL : 'public')));
+			$method->setFinal($from->isFinal());
+			$method->setAbstract($from->isAbstract() && !$isInterface);
+			$method->setBody($from->isAbstract() ? FALSE : '');
 		}
-		$method->returnReference = $from->returnsReference();
-		$method->variadic = $from->isVariadic();
-		$method->comment = $from->getDocComment() ? preg_replace('#^\s*\* ?#m', '', trim($from->getDocComment(), "/* \r\n\t")) : NULL;
+		$method->setReturnReference($from->returnsReference());
+		$method->setVariadic($from->isVariadic());
+		$method->setComment(Helpers::unformatDocComment($from->getDocComment()));
 		if (PHP_VERSION_ID >= 70000 && $from->hasReturnType()) {
-			$method->returnType = (string) $from->getReturnType();
+			$method->setReturnType((string) $from->getReturnType());
+			$method->setReturnNullable($from->getReturnType()->allowsNull());
 		}
 		return $method;
 	}
