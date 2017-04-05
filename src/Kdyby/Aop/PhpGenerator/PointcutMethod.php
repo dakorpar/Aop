@@ -48,6 +48,39 @@ class PointcutMethod extends Code\Method
 	private $after = [];
 
 
+	/**
+	 * @return self
+	 */
+	public static function from($from)
+	{
+		if (is_string($from) && strpos($from, '::')) {
+			$from = new \ReflectionMethod($from);
+		} elseif (is_array($from)) {
+			$from = new \ReflectionMethod($from[0], $from[1]);
+		} elseif (!$from instanceof \ReflectionFunctionAbstract) {
+			$from = new \ReflectionFunction($from);
+		}
+
+		$method = new static($from->isClosure() ? NULL : $from->getName());
+		foreach ($from->getParameters() as $param) {
+			$method->parameters[$param->getName()] = Parameter::from($param);
+		}
+		if ($from instanceof \ReflectionMethod) {
+			$method->static = $from->isStatic();
+			$method->visibility = $from->isPrivate() ? 'private' : ($from->isProtected() ? 'protected' : NULL);
+			$method->final = $from->isFinal();
+			$method->abstract = $from->isAbstract() && !$from->getDeclaringClass()->isInterface();
+			$method->body = $from->isAbstract() ? FALSE : '';
+		}
+		$method->returnReference = $from->returnsReference();
+		$method->variadic = $from->isVariadic();
+		$method->comment = $from->getDocComment() ? preg_replace('#^\s*\* ?#m', '', trim($from->getDocComment(), "/* \r\n\t")) : NULL;
+		if (PHP_VERSION_ID >= 70000 && $from->hasReturnType()) {
+			$method->returnType = (string) $from->getReturnType();
+		}
+		return $method;
+	}
+
 
 	public function addAdvice(Kdyby\Aop\DI\AdviceDefinition $adviceDef)
 	{
