@@ -18,7 +18,7 @@
 	},
 	"require": {
 		"nette/di": "~2.4",
-		"nette/php-generator": "~2.3",
+		"nette/php-generator": "~2.6",
 
 		"kdyby/annotations": "^2.1",
 		"symfony/property-access": "~3.2"
@@ -36,7 +36,6 @@
 		"nette/http": "~2.4",
 		"nette/mail": "~2.4",
 		"nette/neon": "~2.4",
-		"nette/php-generator": "~2.3",
 		"nette/reflection": "~2.4",
 		"nette/robot-loader": "~2.4",
 		"nette/safe-stream": "~2.3",
