@@ -244,7 +244,9 @@ class PointcutMethod extends Code\Method
 
 		foreach ($from->getParameters() as $paramRefl) {
 			try {
-				$parameters[$paramRefl->getName()]->setTypeHint($paramRefl->isArray() ? 'array' : ($paramRefl->getClass() ? '\\' . $paramRefl->getClass()->getName() : ''));
+				if(!in_array($parameters[$paramRefl->getName()]->getTypeHint(),['boolean', 'integer', 'float', 'string', 'object', 'int', 'bool', ])) {
+					$parameters[$paramRefl->getName()]->setTypeHint($paramRefl->isArray() ? 'array' : ($paramRefl->getClass() ? '\\' . $paramRefl->getClass()->getName() : ''));
+				}
 			} catch (\ReflectionException $e) {
 				if (preg_match('#Class (.+) does not exist#', $e->getMessage(), $m)) {
 					$parameters[$paramRefl->getName()]->setTypeHint('\\' . $m[1]);

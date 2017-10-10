@@ -29,10 +29,9 @@ class AdvisedClassTypeTest extends Tester\TestCase
 		$testClass = ClassType::from(TestClass::class);
 
 		$method = Kdyby\Aop\PhpGenerator\AdvisedClassType::setMethodInstance($testClass, $testClass->getMethod('first'));
+		$string = $methodCode = $method->__toString();
 		Assert::count(2, $method->getParameters());
 	}
-
-
 }
 
 class TestClass
